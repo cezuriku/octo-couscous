@@ -6,6 +6,8 @@ default-run = "server"
 
 [dependencies]
 bevy = "0.14.0"
+bevy_renet = "0.0.12"
+rand = "0.8.5"
 
 [[bin]]
 name = "client"
