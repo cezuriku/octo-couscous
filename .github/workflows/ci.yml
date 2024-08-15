@@ -1,0 +1,56 @@
+name: Cargo Build & Test
+
+on:
+  push:
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        build:
+          - dev
+          - release
+
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup update stable && rustup default stable
+      - run: cargo build --profile ${{ matrix.build }} --verbose
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup update stable && rustup default stable
+      - run: cargo test --verbose
+
+  # Check Code style quickly by running `rustfmt` over all code
+  rustfmt:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - run: rustup update stable && rustup default stable
+    - run: rustup component add rustfmt
+    - run: cargo fmt --all --check
+
+  # Ensure there are no clippy warnings
+  clippy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup update stable && rustup default stable
+      - run: rustup component add clippy
+      - run: cargo clippy --workspace --all-targets --no-deps -- -D warnings
+
+  # Ensure Cargo.lock is up-to-date
+  lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup update stable && rustup default stable
+      - run: cargo update -p octo-couscous --locked
