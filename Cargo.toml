@@ -5,9 +5,10 @@ edition = "2021"
 default-run = "server"
 
 [dependencies]
-bevy = "0.14.0"
+bevy = { version = "0.14.0", features = ["dynamic_linking"] }
 bevy_renet = "0.0.12"
 rand = "0.8.5"
+map_plugin = { path = "map_plugin" }
 
 [[bin]]
 name = "client"
@@ -16,4 +17,3 @@ path = "src/client/main.rs"
 [[bin]]
 name = "server"
 path = "src/server/main.rs"
-
