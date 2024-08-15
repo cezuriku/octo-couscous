@@ -18,6 +18,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: sudo apt-get install g++ pkg-config libx11-dev libasound2-dev libudev-dev libxkbcommon-x11-0
       - run: rustup update stable && rustup default stable
       - run: cargo build --profile ${{ matrix.build }} --verbose
 
@@ -26,6 +28,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: sudo apt-get install g++ pkg-config libx11-dev libasound2-dev libudev-dev libxkbcommon-x11-0
       - run: rustup update stable && rustup default stable
       - run: cargo test -p map_plugin --verbose
       - run: cargo test --verbose
@@ -44,6 +48,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: sudo apt-get install g++ pkg-config libx11-dev libasound2-dev libudev-dev libxkbcommon-x11-0
       - run: rustup update stable && rustup default stable
       - run: rustup component add clippy
       - run: cargo clippy --workspace --all-targets --no-deps -- -D warnings
