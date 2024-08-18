@@ -2,6 +2,7 @@
 name = "server"
 version = "0.1.0"
 edition = "2021"
+default-run = "server"
 
 [dependencies]
 bevy = { version = "0.14", features = ["dynamic_linking"] }
