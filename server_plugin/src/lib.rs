@@ -6,6 +6,7 @@ use bevy_renet::renet::transport::{NetcodeServerTransport, ServerAuthentication,
 use bevy_renet::renet::{ClientId, ConnectionConfig, DefaultChannel, RenetServer, ServerEvent};
 use bevy_renet::transport::NetcodeServerPlugin;
 use bevy_renet::RenetServerPlugin;
+use map_plugin::resources::Map;
 use protos::protos::messages::*;
 
 pub struct ServerPlugin;
@@ -59,6 +60,7 @@ fn receive_message_system(mut server: ResMut<RenetServer>) {
 fn handle_events_system(
     mut server_events: EventReader<ServerEvent>,
     mut server: ResMut<RenetServer>,
+    map: Option<Res<Map>>,
 ) {
     for event in server_events.read() {
         match event {
@@ -69,6 +71,9 @@ fn handle_events_system(
                     *client_id,
                     format!("Welcome client {client_id}"),
                 );
+                if let Some(map) = &map {
+                    send_new_map_message(&mut server, *client_id, map);
+                }
             }
             ServerEvent::ClientDisconnected { client_id, reason } => {
                 println!("Client {client_id} disconnected: {reason}");
@@ -81,6 +86,21 @@ fn send_debug_message(server: &mut ResMut<RenetServer>, client_id: ClientId, mes
     let packet = ServerMessage {
         message: Some(server_message::Message::DebugMessage(DebugMessage {
             content: message,
+        })),
+    };
+    server.send_message(
+        client_id,
+        DefaultChannel::ReliableOrdered,
+        protos::serialize_server_message(packet),
+    );
+}
+
+fn send_new_map_message(server: &mut ResMut<RenetServer>, client_id: ClientId, map: &Res<Map>) {
+    let packet = ServerMessage {
+        message: Some(server_message::Message::NewMap(NewMapMessage {
+            height: map.height,
+            width: map.width,
+            gold: map.gold,
         })),
     };
     server.send_message(

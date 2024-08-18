@@ -1,5 +1,3 @@
-use std::io::Cursor;
-
 use prost::Message;
 use protos::messages::*;
 
@@ -24,7 +22,11 @@ pub fn serialize_server_message(server_message: ServerMessage) -> Vec<u8> {
 }
 
 pub fn deserialize_client_message(buf: &[u8]) -> Result<ClientMessage, prost::DecodeError> {
-    ClientMessage::decode(&mut Cursor::new(buf))
+    ClientMessage::decode(buf)
+}
+
+pub fn deserialize_server_message(buf: &[u8]) -> Result<ServerMessage, prost::DecodeError> {
+    ServerMessage::decode(buf)
 }
 
 #[cfg(test)]
@@ -42,10 +44,8 @@ mod test {
         let inner_message = message.message;
         assert!(inner_message.is_some());
         let mut content: String = String::from("");
-        if let Some(m) = inner_message {
-            match m {
-                Message::DebugMessage(debug_message) => content = debug_message.content,
-            }
+        if let Some(Message::DebugMessage(debug_message)) = inner_message {
+            content = debug_message.content
         }
         assert_eq!(content, String::from("Hello"))
     }

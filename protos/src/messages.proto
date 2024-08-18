@@ -2,7 +2,10 @@ syntax = "proto3";
 
 package protos.messages;
 message ServerMessage {
-  oneof message { DebugMessage debug_message = 1; }
+  oneof message {
+    DebugMessage debug_message = 1;
+    NewMapMessage new_map = 2;
+  }
 }
 
 message ClientMessage {
@@ -10,3 +13,9 @@ message ClientMessage {
 }
 
 message DebugMessage { string content = 1; }
+
+message NewMapMessage {
+  int32 width = 1;
+  int32 height = 2;
+  int32 gold = 3;
+}

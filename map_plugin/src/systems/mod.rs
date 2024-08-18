@@ -5,7 +5,7 @@ pub fn create_map(mut commands: Commands) {
     let map = Map {
         width: 4,
         height: 4,
-        gold: 0,
+        gold: 200,
     };
     for x in 0..map.width {
         for y in 0..map.height {

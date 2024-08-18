@@ -55,7 +55,7 @@ impl IControl for NetworkControl {
         if self.client.is_connected() {
             // Receive message from server
             while let Some(message) = self.client.receive_message(DefaultChannel::ReliableOrdered) {
-                self.handle_client_message(message);
+                self.handle_server_message(message);
             }
         }
     }
@@ -113,14 +113,17 @@ impl NetworkControl {
         }
     }
 
-    fn handle_client_message(&mut self, &message: Bytes) {
-        match protos::deserialize_client_message(&message) {
+    fn handle_server_message(&mut self, &message: Bytes) {
+        match protos::deserialize_server_message(&message) {
             Err(_) => println!("Could not deserialize message"),
             Ok(packet) => {
                 if let Some(packet_message) = packet.message {
                     match packet_message {
-                        client_message::Message::DebugMessage(debug_message) => {
-                            godot_print!("Server send: {}", debug_message.content);
+                        server_message::Message::DebugMessage(debug_message) => {
+                            godot_print!("[Server DEBUG]: {}", debug_message.content);
+                        }
+                        server_message::Message::NewMap(message) => {
+                            godot_print!("Gold: {}", message.gold)
                         }
                     }
                 }
