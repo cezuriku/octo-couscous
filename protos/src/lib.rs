@@ -1,7 +1,7 @@
 use std::io::Cursor;
 
 use prost::Message;
-use protos::messages::ClientMessage;
+use protos::messages::*;
 
 pub mod protos {
     pub mod messages {
@@ -13,6 +13,13 @@ pub fn serialize_client_message(client_message: ClientMessage) -> Vec<u8> {
     let mut buf = Vec::with_capacity(client_message.encoded_len());
 
     client_message.encode(&mut buf).unwrap();
+    buf
+}
+
+pub fn serialize_server_message(server_message: ServerMessage) -> Vec<u8> {
+    let mut buf = Vec::with_capacity(server_message.encoded_len());
+
+    server_message.encode(&mut buf).unwrap();
     buf
 }
 

@@ -3,10 +3,10 @@ use std::time::SystemTime;
 
 use bevy::prelude::*;
 use bevy_renet::renet::transport::{NetcodeServerTransport, ServerAuthentication, ServerConfig};
-use bevy_renet::renet::{ConnectionConfig, DefaultChannel, RenetServer, ServerEvent};
+use bevy_renet::renet::{ClientId, ConnectionConfig, DefaultChannel, RenetServer, ServerEvent};
 use bevy_renet::transport::NetcodeServerPlugin;
 use bevy_renet::RenetServerPlugin;
-use protos::protos::messages::client_message::Message;
+use protos::protos::messages::*;
 
 pub struct ServerPlugin;
 
@@ -31,19 +31,8 @@ impl Plugin for ServerPlugin {
             .insert_resource(server)
             .add_plugins(NetcodeServerPlugin)
             .insert_resource(transport)
-            .add_systems(
-                Update,
-                (
-                    send_message_system,
-                    receive_message_system,
-                    handle_events_system,
-                ),
-            );
+            .add_systems(Update, (receive_message_system, handle_events_system));
     }
-}
-
-fn send_message_system(mut _server: ResMut<RenetServer>) {
-    // Do nothing
 }
 
 fn receive_message_system(mut server: ResMut<RenetServer>) {
@@ -56,14 +45,13 @@ fn receive_message_system(mut server: ResMut<RenetServer>) {
                 Ok(packet) => {
                     if let Some(packet_message) = packet.message {
                         match packet_message {
-                            Message::DebugMessage(debug_message) => {
+                            client_message::Message::DebugMessage(debug_message) => {
                                 println!("Message from id:{client_id} {}", debug_message.content)
                             }
                         }
                     }
                 }
             }
-            // Handle received message
         }
     }
 }
@@ -76,11 +64,28 @@ fn handle_events_system(
         match event {
             ServerEvent::ClientConnected { client_id } => {
                 println!("Client {client_id} connected");
-                server.send_message(*client_id, DefaultChannel::ReliableOrdered, "Hello");
+                send_debug_message(
+                    &mut server,
+                    *client_id,
+                    format!("Welcome client {client_id}"),
+                );
             }
             ServerEvent::ClientDisconnected { client_id, reason } => {
                 println!("Client {client_id} disconnected: {reason}");
             }
         }
     }
+}
+
+fn send_debug_message(server: &mut ResMut<RenetServer>, client_id: ClientId, message: String) {
+    let packet = ServerMessage {
+        message: Some(server_message::Message::DebugMessage(DebugMessage {
+            content: message,
+        })),
+    };
+    server.send_message(
+        client_id,
+        DefaultChannel::ReliableOrdered,
+        protos::serialize_server_message(packet),
+    );
 }

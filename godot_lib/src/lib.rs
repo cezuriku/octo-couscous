@@ -8,6 +8,7 @@ use godot::classes::*;
 use godot::prelude::*;
 use renet::transport::ClientAuthentication;
 use renet::transport::NetcodeClientTransport;
+use renet::Bytes;
 use renet::ConnectionConfig;
 use renet::DefaultChannel;
 use renet::RenetClient;
@@ -49,6 +50,13 @@ impl IControl for NetworkControl {
                 .unwrap();
 
             transport.send_packets(&mut self.client).unwrap();
+        }
+
+        if self.client.is_connected() {
+            // Receive message from server
+            while let Some(message) = self.client.receive_message(DefaultChannel::ReliableOrdered) {
+                self.handle_client_message(message);
+            }
         }
     }
 }
@@ -102,6 +110,21 @@ impl NetworkControl {
                 DefaultChannel::ReliableOrdered,
                 protos::serialize_client_message(packet),
             );
+        }
+    }
+
+    fn handle_client_message(&mut self, &message: Bytes) {
+        match protos::deserialize_client_message(&message) {
+            Err(_) => println!("Could not deserialize message"),
+            Ok(packet) => {
+                if let Some(packet_message) = packet.message {
+                    match packet_message {
+                        client_message::Message::DebugMessage(debug_message) => {
+                            godot_print!("Server send: {}", debug_message.content);
+                        }
+                    }
+                }
+            }
         }
     }
 }
