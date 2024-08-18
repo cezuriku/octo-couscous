@@ -64,7 +64,6 @@ fn handle_events_system(
     mut server: ResMut<RenetServer>,
 ) {
     for event in server_events.read() {
-        println!("Event received");
         match event {
             ServerEvent::ClientConnected { client_id } => {
                 println!("Client {client_id} connected");

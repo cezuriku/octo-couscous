@@ -8,6 +8,7 @@ use godot::prelude::*;
 use renet::transport::ClientAuthentication;
 use renet::transport::NetcodeClientTransport;
 use renet::ConnectionConfig;
+use renet::DefaultChannel;
 use renet::RenetClient;
 
 struct MyExtension;
@@ -71,5 +72,15 @@ impl NetworkControl {
 
         self.transport =
             Some(NetcodeClientTransport::new(current_time, authentication, socket).unwrap());
+    }
+
+    #[func]
+    pub fn send_message(&mut self, message: GString) {
+        godot_print!("Send {message}");
+
+        if self.server_addr.is_some() {
+            self.client
+                .send_message(DefaultChannel::ReliableOrdered, message.to_string());
+        }
     }
 }
