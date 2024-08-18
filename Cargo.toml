@@ -1,9 +1,3 @@
-[package]
-name = "octo-couscous"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-bevy = { version = "0.14", features = ["dynamic_linking"] }
-map_plugin = { version = "0.1.0", path = "map_plugin" }
-server_plugin = { version = "0.1.0", path = "server_plugin" }
+[workspace]
+members = ["server"]
+resolver = "2"
