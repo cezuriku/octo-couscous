@@ -6,6 +6,7 @@ use bevy_renet::renet::transport::{NetcodeServerTransport, ServerAuthentication,
 use bevy_renet::renet::{ConnectionConfig, DefaultChannel, RenetServer, ServerEvent};
 use bevy_renet::transport::NetcodeServerPlugin;
 use bevy_renet::RenetServerPlugin;
+use protos::protos::messages::client_message::Message;
 
 pub struct ServerPlugin;
 
@@ -50,10 +51,18 @@ fn receive_message_system(mut server: ResMut<RenetServer>) {
     for client_id in server.clients_id() {
         while let Some(message) = server.receive_message(client_id, DefaultChannel::ReliableOrdered)
         {
-            println!(
-                "Message from id:{client_id} {}",
-                std::str::from_utf8(&message).unwrap()
-            )
+            match protos::deserialize_client_message(&message) {
+                Err(_) => println!("Could not deserialize message"),
+                Ok(packet) => {
+                    if let Some(packet_message) = packet.message {
+                        match packet_message {
+                            Message::DebugMessage(debug_message) => {
+                                println!("Message from id:{client_id} {}", debug_message.content)
+                            }
+                        }
+                    }
+                }
+            }
             // Handle received message
         }
     }

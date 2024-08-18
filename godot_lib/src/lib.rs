@@ -3,6 +3,7 @@ use std::net::UdpSocket;
 use std::time::Duration;
 use std::time::SystemTime;
 
+use client_message::Message;
 use godot::classes::*;
 use godot::prelude::*;
 use renet::transport::ClientAuthentication;
@@ -10,6 +11,8 @@ use renet::transport::NetcodeClientTransport;
 use renet::ConnectionConfig;
 use renet::DefaultChannel;
 use renet::RenetClient;
+
+use protos::protos::messages::*;
 
 struct MyExtension;
 
@@ -81,6 +84,24 @@ impl NetworkControl {
         if self.server_addr.is_some() {
             self.client
                 .send_message(DefaultChannel::ReliableOrdered, message.to_string());
+        }
+    }
+
+    #[func]
+    pub fn send_debug_message(&mut self, message: GString) {
+        godot_print!("Send debug {message}");
+
+        let packet: ClientMessage = ClientMessage {
+            message: Some(Message::DebugMessage(DebugMessage {
+                content: String::from(message),
+            })),
+        };
+
+        if self.server_addr.is_some() {
+            self.client.send_message(
+                DefaultChannel::ReliableOrdered,
+                protos::serialize_client_message(packet),
+            );
         }
     }
 }
