@@ -1,3 +1,10 @@
 [workspace]
-members = ["server", "map_plugin", "server_plugin", "godot_lib", "protos"]
+members = [
+    "server",
+    "map_plugin",
+    "server_plugin",
+    "godot_lib",
+    "protos",
+    "dummy_client",
+]
 resolver = "2"
