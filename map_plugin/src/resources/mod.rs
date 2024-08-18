@@ -2,8 +2,8 @@ use bevy::prelude::*;
 
 #[derive(Resource)]
 pub struct Map {
-    pub width: i32,
     pub height: i32,
+    pub width: i32,
     pub gold: i32,
 }
 

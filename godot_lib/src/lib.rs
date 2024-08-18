@@ -123,11 +123,22 @@ impl NetworkControl {
                             godot_print!("[Server DEBUG]: {}", debug_message.content);
                         }
                         server_message::Message::NewMap(message) => {
-                            godot_print!("Gold: {}", message.gold)
+                            godot_print!("Gold: {}", message.gold);
+                            self.base_mut().emit_signal(
+                                "new_map_received".into(),
+                                &[
+                                    Variant::from(message.height),
+                                    Variant::from(message.width),
+                                    Variant::from(message.gold),
+                                ],
+                            );
                         }
                     }
                 }
             }
         }
     }
+
+    #[signal]
+    fn new_map_received(height: i32, width: i32, gold: i32);
 }
