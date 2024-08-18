@@ -182,6 +182,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "anyhow"
+version = "1.0.86"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b3d1d046238990b9cf5bcde22a3fb3584ee5cf65fb2765f454ed428c7a0063da"
+
+[[package]]
 name = "approx"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1152,7 +1158,7 @@ dependencies = [
  "bitflags 2.6.0",
  "cexpr",
  "clang-sys",
- "itertools",
+ "itertools 0.12.1",
  "lazy_static",
  "lazycell",
  "proc-macro2",
@@ -2336,6 +2342,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "itertools"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "413ee7dfc52ee1a4949ceeb7dbc8a33f2d6c088194d9f922fb8318faf1f01186"
+dependencies = [
+ "either",
+]
+
+[[package]]
 name = "itoa"
 version = "1.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2575,6 +2590,12 @@ dependencies = [
  "adler",
  "simd-adler32",
 ]
+
+[[package]]
+name = "multimap"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "defc4c55412d89136f966bbb339008b474350e5e6e78d2714439c386b3137a03"
 
 [[package]]
 name = "naga"
@@ -3211,6 +3232,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e8cf8e6a8aa66ce33f63993ffc4ea4271eb5b0530a9002db8455ea6050c77bfa"
 
 [[package]]
+name = "prettyplease"
+version = "0.2.20"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5f12335488a2f3b0a83b14edad48dca9879ce89b2edd10e80237e4e852dd645e"
+dependencies = [
+ "proc-macro2",
+ "syn 2.0.75",
+]
+
+[[package]]
 name = "proc-macro-crate"
 version = "3.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3233,6 +3264,67 @@ name = "profiling"
 version = "1.0.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "43d84d1d7a6ac92673717f9f6d1518374ef257669c24ebc5ac25d5033828be58"
+
+[[package]]
+name = "prost"
+version = "0.13.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e13db3d3fde688c61e2446b4d843bc27a7e8af269a69440c0308021dc92333cc"
+dependencies = [
+ "bytes",
+ "prost-derive",
+]
+
+[[package]]
+name = "prost-build"
+version = "0.13.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5bb182580f71dd070f88d01ce3de9f4da5021db7115d2e1c3605a754153b77c1"
+dependencies = [
+ "bytes",
+ "heck",
+ "itertools 0.13.0",
+ "log",
+ "multimap",
+ "once_cell",
+ "petgraph",
+ "prettyplease",
+ "prost",
+ "prost-types",
+ "regex",
+ "syn 2.0.75",
+ "tempfile",
+]
+
+[[package]]
+name = "prost-derive"
+version = "0.13.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "18bec9b0adc4eba778b33684b7ba3e7137789434769ee3ce3930463ef904cfca"
+dependencies = [
+ "anyhow",
+ "itertools 0.13.0",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.75",
+]
+
+[[package]]
+name = "prost-types"
+version = "0.13.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cee5168b05f49d4b0ca581206eb14a7b22fafd963efe729ac48eb03266e25cc2"
+dependencies = [
+ "prost",
+]
+
+[[package]]
+name = "protos"
+version = "0.1.0"
+dependencies = [
+ "prost",
+ "prost-build",
+]
 
 [[package]]
 name = "quote"
@@ -3404,6 +3496,7 @@ name = "rust_project"
 version = "0.1.0"
 dependencies = [
  "godot",
+ "protos",
  "renet",
 ]
 
@@ -3510,6 +3603,7 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "bevy_renet",
+ "protos",
 ]
 
 [[package]]
@@ -3640,6 +3734,19 @@ dependencies = [
  "num-traits",
  "serde",
  "slotmap",
+]
+
+[[package]]
+name = "tempfile"
+version = "3.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "04cbcdd0c794ebb0d4cf35e88edd2f7d2c4c3e9a5a6dab322839b321c6a87a64"
+dependencies = [
+ "cfg-if",
+ "fastrand",
+ "once_cell",
+ "rustix",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
