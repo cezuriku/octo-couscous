@@ -6,6 +6,7 @@ use bevy_renet::renet::transport::{NetcodeServerTransport, ServerAuthentication,
 use bevy_renet::renet::{ClientId, ConnectionConfig, DefaultChannel, RenetServer, ServerEvent};
 use bevy_renet::transport::NetcodeServerPlugin;
 use bevy_renet::RenetServerPlugin;
+use map_plugin::components::{Cell, GoldMine};
 use map_plugin::resources::Map;
 use protos::protos::messages::*;
 
@@ -32,11 +33,22 @@ impl Plugin for ServerPlugin {
             .insert_resource(server)
             .add_plugins(NetcodeServerPlugin)
             .insert_resource(transport)
-            .add_systems(Update, (receive_message_system, handle_events_system));
+            .add_systems(
+                Update,
+                (
+                    receive_message_system,
+                    handle_events_system,
+                    send_update_map_message,
+                ),
+            );
     }
 }
 
-fn receive_message_system(mut server: ResMut<RenetServer>) {
+fn receive_message_system(
+    mut server: ResMut<RenetServer>,
+    query: Query<(Entity, &Cell)>,
+    mut commands: Commands,
+) {
     // Receive message from all clients
     for client_id in server.clients_id() {
         while let Some(message) = server.receive_message(client_id, DefaultChannel::ReliableOrdered)
@@ -48,6 +60,18 @@ fn receive_message_system(mut server: ResMut<RenetServer>) {
                         match packet_message {
                             client_message::Message::DebugMessage(debug_message) => {
                                 println!("Message from id:{client_id} {}", debug_message.content)
+                            }
+                            client_message::Message::CreateGoldMine(message) => {
+                                if let Some((entity, _)) = query
+                                    .iter()
+                                    .find(|e| e.1.x == message.x && e.1.y == message.y)
+                                {
+                                    println!(
+                                        "Create gold mine id:{client_id} ({}, {})",
+                                        message.x, message.y
+                                    );
+                                    commands.entity(entity).insert(GoldMine { production: 1 });
+                                }
                             }
                         }
                     }
@@ -93,6 +117,20 @@ fn send_debug_message(server: &mut ResMut<RenetServer>, client_id: ClientId, mes
         DefaultChannel::ReliableOrdered,
         protos::serialize_server_message(packet),
     );
+}
+
+fn send_update_map_message(mut server: ResMut<RenetServer>, map: Res<Map>) {
+    if map.is_changed() {
+        let packet = ServerMessage {
+            message: Some(server_message::Message::UpdateMap(UpdateMapMessage {
+                gold: map.gold,
+            })),
+        };
+        server.broadcast_message(
+            DefaultChannel::ReliableOrdered,
+            protos::serialize_server_message(packet),
+        );
+    }
 }
 
 fn send_new_map_message(server: &mut ResMut<RenetServer>, client_id: ClientId, map: &Res<Map>) {

@@ -113,6 +113,22 @@ impl NetworkControl {
         }
     }
 
+    #[func]
+    pub fn send_build_message(&mut self, x: i32, y: i32) {
+        godot_print!("Build {} {}", x, y);
+
+        let packet: ClientMessage = ClientMessage {
+            message: Some(Message::CreateGoldMine(CreateGoldMineMessage { x, y })),
+        };
+
+        if self.server_addr.is_some() {
+            self.client.send_message(
+                DefaultChannel::ReliableOrdered,
+                protos::serialize_client_message(packet),
+            );
+        }
+    }
+
     fn handle_server_message(&mut self, &message: Bytes) {
         match protos::deserialize_server_message(&message) {
             Err(_) => println!("Could not deserialize message"),
@@ -133,6 +149,13 @@ impl NetworkControl {
                                 ],
                             );
                         }
+                        server_message::Message::UpdateMap(message) => {
+                            godot_print!("Gold: {}", message.gold);
+                            self.base_mut().emit_signal(
+                                "update_map_received".into(),
+                                &[Variant::from(message.gold)],
+                            );
+                        }
                     }
                 }
             }
@@ -141,4 +164,7 @@ impl NetworkControl {
 
     #[signal]
     fn new_map_received(height: i32, width: i32, gold: i32);
+
+    #[signal]
+    fn update_map_received(gold: i32);
 }

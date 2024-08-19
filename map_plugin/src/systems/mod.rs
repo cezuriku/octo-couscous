@@ -13,7 +13,7 @@ pub fn create_map(mut commands: Commands) {
         }
     }
     commands.insert_resource(map);
-    commands.insert_resource(GoldTimer(Timer::from_seconds(0.5, TimerMode::Repeating)));
+    commands.insert_resource(GoldTimer(Timer::from_seconds(1.0, TimerMode::Repeating)));
 }
 
 pub fn collect_gold(

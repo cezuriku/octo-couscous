@@ -1,15 +1,20 @@
 syntax = "proto3";
 
 package protos.messages;
+
 message ServerMessage {
   oneof message {
     DebugMessage debug_message = 1;
     NewMapMessage new_map = 2;
+    UpdateMapMessage update_map = 3;
   }
 }
 
 message ClientMessage {
-  oneof message { DebugMessage debug_message = 1; }
+  oneof message {
+    DebugMessage debug_message = 1;
+    CreateGoldMineMessage create_gold_mine = 2;
+  }
 }
 
 message DebugMessage { string content = 1; }
@@ -18,4 +23,13 @@ message NewMapMessage {
   int32 height = 1;
   int32 width = 2;
   int32 gold = 3;
+}
+
+message UpdateMapMessage {
+  int32 gold = 1;
+}
+
+message CreateGoldMineMessage {
+  int32 x = 1;
+  int32 y = 2;
 }
